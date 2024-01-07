@@ -16,16 +16,37 @@ public class MatrixTest {
 		assertTrue(m1.equals(m2));
 		assertFalse(m1.equals(m3));
 	}
+	
+	@Test
+	public void testAddMatrices() {
+		Matrix m1 = new Matrix(2,2,i->i);
+		Matrix m2 = new Matrix(2,2,i->i*1.5);
+		Matrix expected = new Matrix(2,2,i->i*2.5);
+		
+		Matrix result = m1.apply((index, value)->value + m2.get(index));
+		
+		assertTrue(expected.equals(result));
+		System.out.println(m1);
+		System.out.println(m2);
+		System.out.println(expected);
+		System.out.println(result);
+	}
 
 	@Test
 	public void testMultiplyDouble() {
 		Matrix m = new  Matrix(3, 4, i -> 0.5*(i-6));
+		
 		double x = 0.5;
+		Matrix expected = new  Matrix(3, 4, i -> x*0.5*(i-6));
 		
 		Matrix result = m.apply((index, value)->x*value);
 		
 		System.out.println(m);
 		System.out.println(result);
+		System.out.println(expected);
+		
+		assertTrue(result.equals(expected));
+		assertTrue(Math.abs(result.get(1) + 1.25000) < 0.0001);
 	}
 	
 	@Test
