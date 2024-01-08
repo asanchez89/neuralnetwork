@@ -8,6 +8,34 @@ import org.junit.Test;
 public class MatrixTest {
 	
 	@Test
+	public void testMultiply() {
+		Matrix m1 = new Matrix(2,3,i->i);
+		Matrix m2 = new Matrix(3,2,i->i);
+		
+		double[] expectedValues = {10, 13, 28, 40};
+		Matrix expected = new Matrix(2,2,i->expectedValues[i]);
+		
+		Matrix result = m1.multiply(m2);
+		assertTrue(expected.equals(result));
+	}
+	
+	@Test
+	public void testMultiplySpeed() {
+		int rows = 500;
+		int cols = 500;
+		int mid = 50;
+		
+		Matrix m1 = new Matrix(rows,mid,i->i);
+		Matrix m2 = new Matrix(mid,cols,i->i);
+		
+		var start = System.currentTimeMillis();
+		m1.multiply(m2);
+		var end = System.currentTimeMillis();
+		
+		System.out.printf("Tiempo de multiplicación de matrices: %dms\n",end-start);
+	}
+	
+	@Test
 	public void testEquals() {
 		Matrix m1 = new  Matrix(3, 4, i -> 0.5*(i-6));
 		Matrix m2 = new  Matrix(3, 4, i -> 0.5*(i-6));
