@@ -14,7 +14,7 @@ public class Matrix {
 	public interface Producer {
 		double produce(int index);
 	}
-	
+
 	public interface IndexValueProducer {
 		double produce(int index, double value);
 	}
@@ -22,11 +22,15 @@ public class Matrix {
 	public interface ValueProducer {
 		double produce(double value);
 	}
-	
+
 	public interface IndexValueConsumer {
 		void consume(int index, double value);
 	}
-	
+
+	public interface RowColValueConsumer {
+		void consume(int row, int col, double value);
+	}
+
 	public interface RowColProducer {
 		double produce(int row, int col, double value);
 	}
@@ -56,7 +60,7 @@ public class Matrix {
 
 		return result;
 	}
-	
+
 	public Matrix modify(RowColProducer producer) {
 
 		int index = 0;
@@ -68,14 +72,24 @@ public class Matrix {
 		}
 		return this;
 	}
-	
+
 	public Matrix modify(ValueProducer producer) {
 		for (int i = 0; i < a.length; ++i) {
 			a[i] = producer.produce(a[i]);
 		}
 		return this;
 	}
-	
+
+	public void forEach(RowColValueConsumer consumer) {
+		int index = 0;
+
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				consumer.consume(row, col, a[index++]);
+			}
+		}
+	}
+
 	public void forEach(IndexValueConsumer consumer) {
 		for (int i = 0; i < a.length; ++i) {
 			consumer.consume(i, a[i]);
@@ -98,18 +112,30 @@ public class Matrix {
 
 		return result;
 	}
-	
+
 	public Matrix sumColumns() {
 		Matrix result = new Matrix(1, cols);
-		
+
 		int index = 0;
-		
+
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				result.a[col] += a[index++];
 			}
 		}
-		
+
+		return result;
+	}
+
+	public Matrix softmax() {
+		Matrix result = new Matrix(rows, cols, i -> Math.exp(a[i]));
+
+		Matrix colSum = result.sumColumns();
+
+		result.modify((row, col, value) -> {
+			return value / colSum.get(col);
+		});
+
 		return result;
 	}
 

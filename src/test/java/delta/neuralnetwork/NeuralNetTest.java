@@ -12,14 +12,35 @@ public class NeuralNetTest {
 	private Random random = new Random();
 
 	@Test
+	public void testSoftmax() {
+		Matrix m = new Matrix(5, 8, i -> random.nextGaussian());
+
+		Matrix result = m.softmax();
+
+		System.out.println(result);
+		
+		double[] colSums = new double[8];
+
+		result.forEach((row, col, value) -> {
+			assertTrue(value >= 0 && value <= 1.0);
+
+			colSums[col] += value;
+		});
+
+		for (var sum : colSums) {
+			assertTrue(Math.abs(sum - 1.0) < 0.00001);
+		}
+	}
+
+	@Test
 	public void testSumColumns() {
 		Matrix m = new Matrix(4, 5, i -> i);
 
 		Matrix result = m.sumColumns();
 
 		double[] expectedValues = { +30.00000, +34.00000, +38.00000, +42.00000, +46.00000 };
-		Matrix expected = new Matrix(1, 5, i->expectedValues[i]);
-		
+		Matrix expected = new Matrix(1, 5, i -> expectedValues[i]);
+
 		assertTrue(expected.equals(result));
 
 	}
