@@ -10,6 +10,54 @@ import delta.matrix.Matrix;
 
 public class NeuralNetTest {
 	private Random random = new Random();
+	
+	@Test
+	public void testEngine() {
+		Engine engine = new Engine();
+		engine.add(Transform.DENSE, 8, 5);
+		engine.add(Transform.RELU);
+		engine.add(Transform.DENSE, 5);
+		engine.add(Transform.RELU);
+		engine.add(Transform.DENSE, 4);
+		engine.add(Transform.SOFTMAX);
+		
+		System.out.println(engine);
+	}
+
+	//@Test
+	public void testTemp() {
+		int inputSize = 5;
+		int layer1Size = 6;
+		int layer2Size = 4;
+		
+		Matrix input = new Matrix(inputSize, 1, i->random.nextGaussian());
+		Matrix layer1Weights = new Matrix(layer1Size, input.getRows(), i->random.nextGaussian());
+		Matrix layer1Biases = new Matrix(layer1Size, 1, i->random.nextGaussian());
+
+		Matrix layer2Weights = new Matrix(layer2Size, layer1Weights.getRows(), i->random.nextGaussian());
+		Matrix layer2Biases = new Matrix(layer2Size, 1, i->random.nextGaussian());
+		
+		var output = input;
+		System.out.println(output);
+		
+		output = layer1Weights.multiply(output);
+		System.out.println(output);
+		
+		output = output.modify((row, col, value) -> value + layer1Biases.get(row));
+		System.out.println(output);
+		
+		output = output.modify(value -> value > 0 ? value : 0);
+		System.out.println(output);
+		
+		output = layer2Weights.multiply(output);
+		System.out.println(output);
+		
+		output = output.modify((row, col, value) -> value + layer2Biases.get(row));
+		System.out.println(output);
+		
+		output = output.softmax();
+		System.out.println(output);
+	}
 
 	@Test
 	public void testSoftmax() {
@@ -17,8 +65,6 @@ public class NeuralNetTest {
 
 		Matrix result = m.softmax();
 
-		System.out.println(result);
-		
 		double[] colSums = new double[8];
 
 		result.forEach((row, col, value) -> {
