@@ -30,6 +30,10 @@ public class Matrix {
 	public interface RowColValueConsumer {
 		void consume(int row, int col, double value);
 	}
+	
+	public interface RowColIndexValueConsumer {
+		void consume(int row, int col, int index, double value);
+	}
 
 	public interface RowColProducer {
 		double produce(int row, int col, double value);
@@ -94,6 +98,16 @@ public class Matrix {
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				consumer.consume(row, col, a[index++]);
+			}
+		}
+	}
+	
+	public void forEach(RowColIndexValueConsumer consumer) {
+		int index = 0;
+
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				consumer.consume(row, col, index, a[index++]);
 			}
 		}
 	}

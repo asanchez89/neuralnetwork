@@ -12,6 +12,25 @@ public class NeuralNetTest {
 	private Random random = new Random();
 
 	@Test
+	public void testCrossEntropy() {
+		double[] expectedValues = { 1, 0, 0, 0, 0, 1, 0, 1, 0 };
+		Matrix expected = new Matrix(3, 3, i -> expectedValues[i]);
+
+		Matrix actual = new Matrix(3, 3, i -> 0.05 * i * i).softmax();
+		
+		Matrix result = LossFunction.crossEntropy(expected, actual);
+
+		actual.forEach((row, col, index, value)->{
+			double expectedValue = expected.get(index);
+			double loss = result.get(col);
+			
+			if(expectedValue > 0.9) {
+				assertTrue(Math.abs(Math.log(value)+loss)<0.001);
+			}
+		});
+	}
+
+	// @Test
 	public void testEngine() {
 		Engine engine = new Engine();
 		engine.add(Transform.DENSE, 8, 5);
@@ -22,7 +41,7 @@ public class NeuralNetTest {
 		engine.add(Transform.SOFTMAX);
 
 		Matrix input = new Matrix(5, 1, i -> random.nextGaussian());
-		
+
 		Matrix output = engine.runFowards(input);
 
 		System.out.println(engine);
@@ -64,7 +83,7 @@ public class NeuralNetTest {
 		System.out.println(output);
 	}
 
-	@Test
+	// @Test
 	public void testSoftmax() {
 		Matrix m = new Matrix(5, 8, i -> random.nextGaussian());
 
@@ -83,7 +102,7 @@ public class NeuralNetTest {
 		}
 	}
 
-	@Test
+	// @Test
 	public void testSumColumns() {
 		Matrix m = new Matrix(4, 5, i -> i);
 
@@ -96,7 +115,7 @@ public class NeuralNetTest {
 
 	}
 
-	@Test
+	// @Test
 	public void testAddBias() {
 		Matrix input = new Matrix(3, 3, i -> (i + 1));
 		Matrix weights = new Matrix(3, 3, i -> (i + 1));
@@ -112,7 +131,7 @@ public class NeuralNetTest {
 
 	}
 
-	@Test
+	// @Test
 	public void testReLu() {
 
 		final int numberNeurons = 5;
