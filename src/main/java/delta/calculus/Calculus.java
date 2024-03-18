@@ -25,7 +25,7 @@ public class Calculus {
 	public static void main(String[] args) {
 
 		for (double x = -2; x < 2; x += 0.1) {
-			double gradient = differentiate(Calculus::func1, x);
+			double gradient = differentiate(Calculus::func2, x);
 			System.out.printf("%.2f\t%.2f\n", x, gradient);
 		}
 	}
