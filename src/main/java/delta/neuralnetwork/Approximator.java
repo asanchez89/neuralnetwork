@@ -7,15 +7,25 @@ import delta.matrix.Matrix;
 public class Approximator {
 
 	public static Matrix gradient(Matrix input, Function<Matrix, Matrix> transform) {
+
+		final double INC = 0.000001;
 		
-		input.forEach((row, col, index, value)->{
-			System.out.printf("%12.5f", value);
+		Matrix loss1 = transform.apply(input);
+		
+		assert loss1.getCols() == input.getCols():"Input/loss columnas no son iguales";
+		assert loss1.getRows() == 1:"La transformada no retorna una sola fila";
+
+		Matrix result = new Matrix(input.getRows(), input.getCols(), i->0);
+		
+		input.forEach((row, col, index, value) -> {
+			Matrix incremented = input.addIncrement(row, col, INC);
 			
-			if(col == input.getCols() -1) {
-				System.out.println();
-			}
+			Matrix loss2 = transform.apply(incremented);
+			
+			double rate = (loss2.get(col)-loss1.get(col))/INC;
+			result.set(row, col, rate);
 		});
-		
-		return null;
+
+		return result;
 	}
 }

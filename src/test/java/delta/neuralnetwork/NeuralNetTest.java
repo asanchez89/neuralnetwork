@@ -12,16 +12,51 @@ public class NeuralNetTest {
 	private Random random = new Random();
 
 	@Test
+	public void testAddIncrement() {
+		Matrix m = new Matrix(5, 8, i->random.nextGaussian());
+		
+		int row = 3;
+		int col = 2;
+		double inc = 10;
+		
+		Matrix result = m.addIncrement(row, col, inc);
+		
+		
+		double incrementedValue = result.get(row, col);
+		double originalValue = m.get(row, col);
+		
+		assertTrue(Math.abs(incrementedValue-(originalValue+inc))<0.00001);
+		
+	}
+	
+	@Test
 	public void testApproximator() {
 		final int rows = 4;
 		final int cols = 5;
 		
-		Matrix input = new Matrix(rows, cols, i->random.nextGaussian());
+		Matrix input = new Matrix(rows, cols, i->random.nextGaussian()).softmax();
+		Matrix expected = new Matrix(rows, cols, i->0);
 		
-		Approximator.gradient(input, null);
+		for (int col = 0; col < cols; col++) {
+			int randomRow = random.nextInt(rows);
+			expected.set(randomRow, col, 1);
+		}
 		
-		System.out.println();
-		System.out.println(input);
+		Matrix result = Approximator.gradient(input, in->{
+			return LossFunction.crossEntropy(expected, in);
+		});
+		
+		input.forEach((index, value)->{
+			double resultValue = result.get(index);
+			double expectedValue = expected.get(index);
+			
+			if(expectedValue < 0.001) {
+				assertTrue(Math.abs(resultValue)<0.01);
+			}else {
+				assertTrue(Math.abs(resultValue + 1.0/value)<0.01);
+			}
+		});
+
 	}
 	
 	@Test
