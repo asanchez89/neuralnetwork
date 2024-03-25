@@ -8,6 +8,21 @@ import org.junit.Test;
 public class MatrixTest {
 	
 	@Test
+	public void testTranspose() {
+		Matrix m = new Matrix(2,3,i->i);
+		
+		Matrix result = m.transpose();
+		
+		double [] expectedValues = {0, 3, 1, 4, 2, 5};
+		Matrix expected = new Matrix(3, 2, i->expectedValues[i]);
+		
+//		System.out.println(m);
+//		System.out.println(result);
+		
+		assertTrue(expected.equals(result));
+	}
+	
+	@Test
 	public void testMultiply() {
 		Matrix m1 = new Matrix(2,3,i->i);
 		Matrix m2 = new Matrix(3,2,i->i);
@@ -32,7 +47,7 @@ public class MatrixTest {
 		m1.multiply(m2);
 		var end = System.currentTimeMillis();
 		
-		System.out.printf("Tiempo de multiplicación de matrices: %dms\n",end-start);
+		//System.out.printf("Tiempo de multiplicación de matrices: %dms\n",end-start);
 	}
 	
 	@Test
@@ -54,10 +69,10 @@ public class MatrixTest {
 		Matrix result = m1.apply((index, value)->value + m2.get(index));
 		
 		assertTrue(expected.equals(result));
-		System.out.println(m1);
-		System.out.println(m2);
-		System.out.println(expected);
-		System.out.println(result);
+//		System.out.println(m1);
+//		System.out.println(m2);
+//		System.out.println(expected);
+//		System.out.println(result);
 	}
 
 	@Test
@@ -69,9 +84,9 @@ public class MatrixTest {
 		
 		Matrix result = m.apply((index, value)->x*value);
 		
-		System.out.println(m);
-		System.out.println(result);
-		System.out.println(expected);
+//		System.out.println(m);
+//		System.out.println(result);
+//		System.out.println(expected);
 		
 		assertTrue(result.equals(expected));
 		assertTrue(Math.abs(result.get(1) + 1.25000) < 0.0001);
