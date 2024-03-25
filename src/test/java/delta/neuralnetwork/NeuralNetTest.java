@@ -10,6 +10,36 @@ import delta.matrix.Matrix;
 
 public class NeuralNetTest {
 	private Random random = new Random();
+	
+	@Test
+	public void testSoftmaxCrossEntropyGradient() {
+		final int rows = 4;
+		final int cols = 5;
+		
+		Matrix input = new Matrix(rows, cols, i->random.nextGaussian());
+		Matrix expected = new Matrix(rows, cols, i->0);
+		
+		for (int col = 0; col < cols; col++) {
+			int randomRow = random.nextInt(rows);
+			expected.set(randomRow, col, 1);
+		}
+		
+		
+		Matrix softmaxOutput = input.softmax();
+		
+		Matrix result = Approximator.gradient(input, in->{
+			return LossFunction.crossEntropy(expected, in.softmax());
+		});
+		
+		result.forEach((index, value)->{
+			double softmaxValue =  softmaxOutput.get(index);
+			double expectedValue = expected.get(index);
+			
+			assertTrue(Math.abs(value - (softmaxValue-expectedValue))<0.01);
+			System.out.println(value+", "+(softmaxValue-expectedValue));
+		});
+
+	}
 
 	@Test
 	public void testAddIncrement() {
