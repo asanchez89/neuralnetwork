@@ -13,22 +13,37 @@ public class NeuralNetTest {
 	
 	@Test
 	public void testEngine() {
-		int inputRows =5;
+		int inputRows = 5;
 		int cols = 6;
 		int outputROws = 4;
 		
 		Engine engine = new Engine();
+		
 		engine.add(Transform.DENSE, 8, 5);
-		engine.add(Transform.RELU);
+		//engine.add(Transform.RELU);
 		engine.add(Transform.DENSE, 5);
-		engine.add(Transform.RELU);
+		//engine.add(Transform.RELU);
 		engine.add(Transform.DENSE, 4);
+		
 		engine.add(Transform.SOFTMAX);
-
+		engine.setStoreInputError(true);
+		
 		Matrix input = Util.generateInputMatrix(inputRows, cols);
 		Matrix expected = Util.generateExpetedMatrix(outputROws, cols);
+		
+		Matrix approximatedError= Approximator.gradient(input, in -> {
+			BatchResult batchResult = engine.runFowards(in);
+			return LossFunctions.crossEntropy(expected, batchResult.getOutput());
+		});
+		
 		BatchResult batchResult = engine.runFowards(input);
 		engine.runBackwards(batchResult, expected);
+		
+		Matrix calculatedError = batchResult.getInputError();
+		
+		calculatedError.setTolerance(0.01);
+		
+		assertTrue(calculatedError.equals(approximatedError));
 
 	}
 	
