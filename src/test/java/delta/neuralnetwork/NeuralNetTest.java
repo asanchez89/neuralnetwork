@@ -12,6 +12,41 @@ public class NeuralNetTest {
 	private Random random = new Random();
 	
 	@Test
+	public void testBackpropWeights() {
+		final int inputRows = 4;
+		final int cols = 5;
+		final int outputRows = 4;
+		
+		
+		Matrix input = new Matrix(inputRows, cols, i->random.nextGaussian());
+		Matrix expected = new Matrix(outputRows, cols, i->0);
+		
+		Matrix weights = new Matrix(outputRows, inputRows, i->random.nextGaussian());
+		Matrix biases = new Matrix(outputRows, 1, i->random.nextGaussian());
+		
+		for (int col = 0; col < cols; col++) {
+			int randomRow = random.nextInt(outputRows);
+			expected.set(randomRow, col, 1);
+		}
+		
+		
+		Matrix softmaxOutput = weights.multiply(input).modify((row, col, value)->value + biases.get(row)).softmax();
+		
+		Matrix approximatedResult = Approximator.gradient(input, in->{
+			in = weights.multiply(in).modify((row, col, value)->value + biases.get(row));
+			return LossFunction.crossEntropy(expected, in.softmax());
+		});
+		
+		Matrix calculatedResult = softmaxOutput.apply((index, value)->value-expected.get(index));
+		calculatedResult = weights.transpose().multiply(calculatedResult);
+		
+		System.out.println(calculatedResult);
+		System.out.println(approximatedResult);
+		
+		assertTrue(approximatedResult.equals(calculatedResult));
+	}
+	
+	@Test
 	public void testSoftmaxCrossEntropyGradient() {
 		final int rows = 4;
 		final int cols = 5;
@@ -36,7 +71,7 @@ public class NeuralNetTest {
 			double expectedValue = expected.get(index);
 			
 			assertTrue(Math.abs(value - (softmaxValue-expectedValue))<0.01);
-			System.out.println(value+", "+(softmaxValue-expectedValue));
+//			System.out.println(value+", "+(softmaxValue-expectedValue));
 		});
 
 	}
