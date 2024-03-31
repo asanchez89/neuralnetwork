@@ -65,7 +65,9 @@ public class Engine {
 			switch (transform) {
 			case DENSE:
 				Matrix weight = weightIt.next();
-				error = weight.transpose().multiply(error);
+				if(weightIt.hasNext() || storeInputError) {
+					error = weight.transpose().multiply(error);
+				}
 				break;
 			case RELU:
 				error = error.apply((index, value) -> input.get(index) > 0 ? value : 0);
