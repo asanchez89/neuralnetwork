@@ -11,10 +11,15 @@ public class Engine {
 	private LinkedList<Matrix> weights = new LinkedList<>();
 	private LinkedList<Matrix> biases = new LinkedList<>();
 
-	Matrix runFowards(Matrix input) {
+	private LossFunction lossFunction = LossFunction.CROSSENTROPY;
+	
+	BatchResult runFowards(Matrix input) {
+		BatchResult batchResult = new BatchResult();
 		Matrix output = input;
 		
 		int denseIndex = 0;
+		batchResult.addIo(output);
+		
 		for (var t : transforms) {
 			if(t== Transform.DENSE) {
 				Matrix weight = weights.get(denseIndex);
@@ -29,9 +34,39 @@ public class Engine {
 				output = output.softmax();
 			}
 			
+			batchResult.addIo(output);
+			
 		}
 		
-		return output;
+		return batchResult;
+	}
+	
+	
+	public Matrix runBackwards(BatchResult batchResult, Matrix expected) {
+		
+		var transformsIt = transforms.descendingIterator();
+		
+		if(lossFunction!= LossFunction.CROSSENTROPY || transforms.getLast() != Transform.SOFTMAX) {
+			throw new UnsupportedOperationException("Loss function must be cross entropy and last transform must be softmax.");
+		}
+		
+		while(transformsIt.hasNext()) {
+			Transform transform = transformsIt.next();
+			switch (transform) {
+			case DENSE:
+				break;
+			case RELU:
+				break;
+			case SOFTMAX:
+				break;
+			default:
+				throw new UnsupportedOperationException("Not Implemented");
+			}
+			
+			
+			System.out.println(transform);
+		}
+		return null;
 	}
 	
 	public void add(Transform transform, double... params) {
