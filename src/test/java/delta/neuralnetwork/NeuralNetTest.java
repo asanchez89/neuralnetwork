@@ -10,44 +10,68 @@ import delta.matrix.Matrix;
 
 public class NeuralNetTest {
 	private Random random = new Random();
-	
+
 	@Test
+	public void testWeightGradient() {
+		int inputRows = 4;
+		int outputRows = 5;
+		Matrix weights = new Matrix(outputRows, inputRows, i -> random.nextGaussian());
+		Matrix input = Util.generateInputMatrix(inputRows, 1);
+		Matrix expected = Util.generateExpetedMatrix(outputRows, 1);
+
+		Matrix output = weights.multiply(input).softmax();
+		Matrix loss = LossFunctions.crossEntropy(expected, output);
+
+		Matrix calculatedError = output.apply((index, value) -> value - expected.get(index));
+
+		Matrix calculatedWeightGradients = calculatedError.multiply(input.transpose());
+
+		Matrix approximatedWeightGradients = Approximator.weightGradient(weights, w -> {
+			Matrix out = w.multiply(input).softmax();
+			return LossFunctions.crossEntropy(expected, out);
+		});
+		
+		calculatedWeightGradients.setTolerance(0.01);
+		assertTrue(calculatedWeightGradients.equals(approximatedWeightGradients));
+	}
+
+	// @Test
 	public void testEngine() {
 		int inputRows = 5;
 		int cols = 6;
 		int outputROws = 4;
-		
+
 		Engine engine = new Engine();
-		
+
 		engine.add(Transform.DENSE, 8, 5);
-		//engine.add(Transform.RELU);
+		// engine.add(Transform.RELU);
 		engine.add(Transform.DENSE, 5);
-		//engine.add(Transform.RELU);
+		// engine.add(Transform.RELU);
 		engine.add(Transform.DENSE, 4);
-		
+
 		engine.add(Transform.SOFTMAX);
 		engine.setStoreInputError(true);
-		
+
 		Matrix input = Util.generateInputMatrix(inputRows, cols);
 		Matrix expected = Util.generateExpetedMatrix(outputROws, cols);
-		
-		Matrix approximatedError= Approximator.gradient(input, in -> {
+
+		Matrix approximatedError = Approximator.gradient(input, in -> {
 			BatchResult batchResult = engine.runFowards(in);
 			return LossFunctions.crossEntropy(expected, batchResult.getOutput());
 		});
-		
+
 		BatchResult batchResult = engine.runFowards(input);
 		engine.runBackwards(batchResult, expected);
-		
+
 		Matrix calculatedError = batchResult.getInputError();
-		
+
 		calculatedError.setTolerance(0.01);
-		
+
 		assertTrue(calculatedError.equals(approximatedError));
 
 	}
-	
-	//@Test
+
+	// @Test
 	public void testBackprop() {
 
 		interface NeuralNet {
@@ -94,7 +118,7 @@ public class NeuralNetTest {
 		assertTrue(approximatedResult.equals(calculatedResult));
 	}
 
-	//@Test
+	// @Test
 	public void testSoftmaxCrossEntropyGradient() {
 		final int rows = 4;
 		final int cols = 5;
@@ -123,7 +147,7 @@ public class NeuralNetTest {
 
 	}
 
-	//@Test
+	// @Test
 	public void testAddIncrement() {
 		Matrix m = new Matrix(5, 8, i -> random.nextGaussian());
 
@@ -140,7 +164,7 @@ public class NeuralNetTest {
 
 	}
 
-	//@Test
+	// @Test
 	public void testApproximator() {
 		final int rows = 4;
 		final int cols = 5;
@@ -170,7 +194,7 @@ public class NeuralNetTest {
 
 	}
 
-	//@Test
+	// @Test
 	public void testCrossEntropy() {
 		double[] expectedValues = { 1, 0, 0, 0, 0, 1, 0, 1, 0 };
 		Matrix expected = new Matrix(3, 3, i -> expectedValues[i]);
