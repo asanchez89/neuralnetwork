@@ -3,7 +3,11 @@ package delta.matrix;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Random;
+
 import org.junit.Test;
+
+import delta.neuralnetwork.Util;
 
 public class MatrixTest {
 	
