@@ -8,6 +8,22 @@ import org.junit.Test;
 public class MatrixTest {
 	
 	@Test
+	public void testAverageColumn() {
+		int rows = 7;
+		int cols = 5;
+		
+		Matrix m = new Matrix(rows, cols, i->2*i-3);
+		
+		double averageIndex = (cols-1)/2.0;
+		
+		Matrix expected = new Matrix(rows, 1);
+		expected.modify((row,col, value)->2*(row*cols + averageIndex)-3);
+		
+		Matrix result = m.averageColumn();
+		assertTrue(expected.equals(result));
+	}
+	
+	@Test
 	public void testTranspose() {
 		Matrix m = new Matrix(2,3,i->i);
 		
