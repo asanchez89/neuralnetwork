@@ -1,5 +1,6 @@
 package delta.neuralnetwork;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -60,6 +61,25 @@ public class Engine {
 		
 		assert weightInputs.size() == weightErrors.size();
 		assert weightInputs.size() == weights.size();
+		
+		for (int i = 0; i < weights.size(); i++) {
+			var weight = weights.get(i);
+			var bias = biases.get(i);
+			var error = weightErrors.get(i);
+			var input = weightInputs.get(i);
+			
+			assert weight.getCols() == input.getRows();
+			
+			var weightAdjust = error.multiply(input.transpose());
+			var biasAdjust = error.averageColumn();
+			
+			double rate = learningRate/weight.getCols();
+			
+			weight.modify((index, value)->value-rate*weightAdjust.get(index));
+			
+			bias.modify((row, col, value)-> value - learningRate*biasAdjust.get(row));
+			
+		}
 		
 	}
 	

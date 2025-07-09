@@ -91,6 +91,14 @@ public class Matrix {
 		}
 		return this;
 	}
+	
+	public Matrix modify(IndexValueProducer producer) {
+		for (int i = 0; i < a.length; ++i) {
+			a[i] = producer.produce(i, a[i]);
+		}
+		return this;
+	}
+
 
 	public void forEach(RowColValueConsumer consumer) {
 		int index = 0;
