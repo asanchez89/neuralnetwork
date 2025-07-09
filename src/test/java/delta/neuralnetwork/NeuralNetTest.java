@@ -37,8 +37,8 @@ public class NeuralNetTest {
 		engine.evaluate(batchResult, expected);
 		
 		double loss2 = batchResult.getLoss();
-		
-		System.out.println(loss1+" "+loss2);
+		double percentCorrect = batchResult.getPercentCorrect();
+		System.out.println(loss1+" "+loss2+" "+percentCorrect);
 		
 	}
 
@@ -142,9 +142,6 @@ public class NeuralNetTest {
 		Matrix calculatedResult = softmaxOutput.apply((index, value) -> value - expected.get(index));
 		calculatedResult = weights.transpose().multiply(calculatedResult);
 		calculatedResult = calculatedResult.apply((index, value) -> input.get(index) > 0 ? value : 0);
-
-		System.out.println(calculatedResult);
-		System.out.println(approximatedResult);
 
 		assertTrue(approximatedResult.equals(calculatedResult));
 	}
